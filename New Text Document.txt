@@ -1,0 +1,21 @@
+free
+cola
+fanta
+ayran
+pizza
+doner
+gamburger
+lahmacun
+sandwich
+1
+0.5
+0.5
+0.6
+10
+2.5
+1.5
+3
+1
+Bineqedi ray.3-cu meden,korpus 177, ev 62q
+Sabuncu Rayonu, Bakixanov Qesebesi
+Yasamal ray.Mirze Serifzade 163
