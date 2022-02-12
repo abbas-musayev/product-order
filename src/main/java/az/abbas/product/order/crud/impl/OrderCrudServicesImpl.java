@@ -38,12 +38,6 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
         Customer customerBySurname = repoCustomer.getCustomerBySurnameAndName(orderDTO.getCustomer().getSurname(), orderDTO.getCustomer().getName());
 
         String address = orderDTO.getAddress();
-//        Bu hisse mentiqi duzgun yazilmiyib
-//        List<Address> address = orderDTO.getCustomer().getAddress();
-//        String addName = null;
-//        for (Address address1 : address) {
-//            addName = address1.getAddressName();
-//        }
 
         //******
         List<ProductAll> productlist = orderDTO.getProductAll();
@@ -71,7 +65,10 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
         List<ProductAll> all = new ArrayList<>();
         //Mehsul Table-inda mehsullarin miqdarinin azalmasi ucun yaranib
         List<Product> all1 = new ArrayList<>();
-        // Mehsullarin adinin yoxlanisi Ve Hesabdan pul cixilmasi Ve ProductList Save Olunur Ve Product miqdarinnan cixilir
+        // Mehsullarin adinin yoxlanisi aparilir
+        // Hesabdan pul cixilmasi
+        // ProductList Save olunur
+        // Product miqdarinnan cixilir
         for (ProductAll item : productlist) {
 
             Product product = repoProduct.findProductByName(item.getProductName());
