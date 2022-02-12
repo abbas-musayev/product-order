@@ -2,16 +2,17 @@ package az.abbas.product.order.crud.impl;
 
 import az.abbas.product.order.crud.services.OrderCrudServices;
 import az.abbas.product.order.db.dto.OrderDTO;
-import az.abbas.food.order.db.entity.*;
+import az.abbas.product.order.db.entity.Customer;
+import az.abbas.product.order.db.entity.Orders;
+import az.abbas.product.order.db.entity.Product;
+import az.abbas.product.order.db.entity.ProductAll;
 import az.abbas.product.order.db.repo.RepoCustomer;
 import az.abbas.product.order.db.repo.RepoOrder;
 import az.abbas.product.order.db.repo.RepoProduct;
 import az.abbas.product.order.db.repo.RepoProductAll;
 import az.abbas.product.order.exception.ThrowInsufficientBalanceException;
 import az.abbas.product.order.exception.ThrowNotFoundExpHandle;
-import az.abbas.product.order.db.entity.*;
 import az.abbas.product.order.search.impl.OrderSearchServicesImpl;
-import com.example.cbrn.generaltask.db.entity.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,23 +33,25 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
     private final RepoProductAll repoProductAll;
     private final OrderSearchServicesImpl orderServices;
 
-    public OrderDTO saveOrder(OrderDTO orderDTO){
+    public OrderDTO saveOrder(OrderDTO orderDTO) {
 
         Customer customerBySurname = repoCustomer.getCustomerBySurnameAndName(orderDTO.getCustomer().getSurname(), orderDTO.getCustomer().getName());
 
-        List<Address> address = orderDTO.getCustomer().getAddress();
-        String addName = null;
-        for (Address address1 : address) {
-            addName = address1.getAddressName();
-        }
+        String address = orderDTO.getAddress();
+//        Bu hisse mentiqi duzgun yazilmiyib
+//        List<Address> address = orderDTO.getCustomer().getAddress();
+//        String addName = null;
+//        for (Address address1 : address) {
+//            addName = address1.getAddressName();
+//        }
 
         //******
         List<ProductAll> productlist = orderDTO.getProductAll();
         //******
         Random random = new Random();
         int i = random.nextInt(90000);
-        if (i<10000){
-            i+=10000;
+        if (i < 10000) {
+            i += 10000;
         }
 
         Float balance = customerBySurname.getBalance();
@@ -58,7 +61,7 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
                 .customer(customerBySurname)
                 .productAll(orderDTO.getProductAll())
                 .enumOrderStatus(orderDTO.getEnumOrderStatus())
-                .address(addName)
+                .address(address)
                 .orderFinisDate(orderDTO.getOrderFinisDate())
                 .order_unique(i)
                 .build();
@@ -73,19 +76,19 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
 
             Product product = repoProduct.findProductByName(item.getProductName());
 
-            if (product != null){
+            if (product != null) {
                 log.info("ProductName null OLMADI");
 
                 Integer miqdar = product.getMiqdar();
-                if (miqdar<=0){
+                if (miqdar <= 0) {
                     throw new ThrowInsufficientBalanceException("Bu Mehsuldan Anbarda Qalmamisdir");
-                }else {
+                } else {
                     //Mehsulun miqdarinnan mehsulun sayi -1 cixilir
                     product.setMiqdar(miqdar - item.getMiqdar());
                     all1.add(product);
                 }
                 //balansdaki pulun yeterli olub-olmadigini yoxlayir
-                if ((customerBySurname.getBalance()- product.getProductPrice())<0){
+                if ((customerBySurname.getBalance() - product.getProductPrice()) < 0) {
                     throw new ThrowInsufficientBalanceException("Az-Yetersiz Bakiye\nEng- Insufficient Balance");
                 }
                 //balansdan pulu cixir
@@ -111,7 +114,7 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
         Orders save = repoOrder.save(orders);
         log.info("Order Save Olundu");
 
-       return OrderDTO.builder()
+        return OrderDTO.builder()
                 .idOrder(save.getIdOrder())
                 .address(save.getAddress())
                 .orderCreatedDate(save.getOrderCreatedDate())
@@ -123,14 +126,15 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
                 .build();
     }
 
-    public Orders changeOrderStatus(OrderDTO dto){
+
+    public Orders changeOrderStatus(OrderDTO dto) {
 
         OrderDTO orderDto = orderServices.findOrderByOrderUnique(dto.getOrder_unique());
 
-        if (orderDto == null){
+        if (orderDto == null) {
             log.info("changeOrderStatus Ucun Order Tapilmadi");
             return null;
-        }else {
+        } else {
 
             Orders order = Orders.builder()
                     .idOrder(orderDto.getIdOrder())
@@ -150,27 +154,26 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
         }
     }
 
-    public String deleteOrder(Integer unique){
+    public String deleteOrder(Integer unique) {
         Orders order = repoOrder.findOrderByOrderUnique(unique);
 
-        if (order==null){
+        if (order == null) {
             throw new ThrowNotFoundExpHandle("Silinmek ucun Sifaris Tapilmadi");
-        }
-        else{
+        } else {
             List<ProductAll> productAll = order.getProductAll();
             repoProductAll.deleteAll(productAll);
-            log.info("ProductAll dan ("+order.getIdOrder()+") id-li sifaris silindi");
+            log.info("ProductAll dan (" + order.getIdOrder() + ") id-li sifaris silindi");
             repoOrder.delete(order);
-            log.info("Sifaris ("+unique+") Silindi");
-            return "Sifaris ("+unique+") Silindi";
+            log.info("Sifaris (" + unique + ") Silindi");
+            return "Sifaris (" + unique + ") Silindi";
         }
     }
 
-    public OrderDTO updateOrder(OrderDTO orderDTO){
+    public OrderDTO updateOrder(OrderDTO orderDTO) {
 
         Orders orders = repoOrder.findOrderByOrderUnique(orderDTO.getOrder_unique());
 
-        if (orders !=null){
+        if (orders != null) {
             Orders build = Orders.builder()
                     .idOrder(orderDTO.getIdOrder())
                     .address(orderDTO.getAddress())
@@ -194,7 +197,7 @@ public class OrderCrudServicesImpl implements OrderCrudServices {
                     .productAll(build.getProductAll())
                     .build();
 
-        }else {
+        } else {
             throw new ThrowNotFoundExpHandle("Update Etmek Istediyiniz Siafris Tapilmadi");
         }
     }

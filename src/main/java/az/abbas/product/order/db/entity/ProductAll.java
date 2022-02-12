@@ -29,7 +29,6 @@ public class ProductAll {
     @JsonView(ViewsOrder.simple.class)
     private Integer miqdar;
     @JsonView(ViewsOrder.simple.class)
-
     private Boolean isDelete;
 
     @ToString.Exclude
