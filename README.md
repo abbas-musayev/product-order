@@ -1,6 +1,6 @@
 # Product Order
 
-### Hello friends. This repo created for Product Order. There are using Maven project, Spring Frameworks and modules.
+### Hello friends. This repo created for Product Order. I coding Java programming. There are using Maven project, Spring Frameworks and modules.
 
 There is a customer here who will register and place an order. And there are addresses to which it is connected.
 The Product entity has also been created to show the types, prices and quantities of goods in the store.
